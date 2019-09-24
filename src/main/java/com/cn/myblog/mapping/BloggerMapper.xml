@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cn.myblog.dao.IBloggerDao">
+	<resultMap id="BaseResultMap2"
+		type="com.cn.myblog.entity.Blogger">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="username" property="username"
+			jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="email" property="email"
+			jdbcType="VARCHAR" />
+		<result column="password" property="password"
+			jdbcType="VARCHAR" />
+		<result column="info" property="info" jdbcType="VARCHAR" />
+		<result column="nickname" property="nickname"
+			jdbcType="VARCHAR" />
+		<result column="sign" property="sign" jdbcType="VARCHAR" />
+		<result column="imagePath" property="imagePath"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List"> id, username,gender,email, password,
+		info,nickname,sign,imagePath
+	</sql>
+	<select id="login" resultType="com.cn.myblog.entity.Blogger"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_blogger where
+		<if test="username!=null">username=#{username}</if>
+		<if test="password!=null">and password=#{password}</if>
+	</select>
+
+
+
+	<!-- 修改博主信息 -->
+	<update id="update" parameterType="com.cn.myblog.entity.Blogger">
+		update t_blogger
+		set
+		username=#{username},
+		password=#{password},
+		gender=#{gender},
+		email=#{email},
+		info=#{info},
+		nickname=#{nickname},
+		sign=#{sign},
+		imagePath=#{imagePath}
+		where id=#{id}
+	</update>
+
+	<!-- 添加博主 -->
+	<insert id="insert" parameterType="com.cn.myblog.entity.Blogger">
+		insert into t_blogger
+		values
+		(#{id},#{username},#{password},#{gender},#{email},#{info},#{nickname},#{sign},#{imagePath})
+	</insert>
+
+	<!-- 增删改查标签里的id:一定要和接口里对应的方法名一致 -->
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from t_blogger where
+		id=#{id}
+	</delete>
+
+	<!-- 根据用户名模糊查询，根据权限查询 -->
+	<select id="select" resultMap="BaseResultMap2"
+		parameterType="java.lang.String">
+		<!-- 用include标签引入sql片段，refid写定义sql片段的id，where标签不要写在片段里 -->
+		select
+		<include refid="Base_Column_List" />
+		from t_blogger
+		<!-- 当页面没有输入用户名和选择权限，就让它的条件永远为真，就变成全查询了 -->
+		<where>
+			<if test="username == null or username = ''">
+				and 1=1
+			</if>
+			<if test="username != null and username !=''">
+				and username LIKE '%${username}%'
+			</if>
+		</where>
+	</select>
+
+	<!--注册验证用户是否已存在 -->
+	<select id="selectByUsername"
+		resultType="com.cn.myblog.entity.Blogger">
+		select
+		id,username,password,
+		gender,email,
+		info,nickname,
+		sign,imagePath
+		from
+		t_blogger
+		where
+		username=#{username}
+
+	</select>
+
+	<select id="selectById"
+		resultType="com.cn.myblog.entity.Blogger">
+		select
+		id,username,password,
+		email,gender,
+		info,nickname,
+		sign,imagePath
+		from
+		t_blogger
+		where
+		id=#{id}
+
+	</select>
+	
+</mapper>

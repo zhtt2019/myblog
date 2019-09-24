@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cn.myblog.dao.IBlogArticleDao">
+	<resultMap id="ArticleResultMap"
+		type="com.cn.myblog.entity.BlogArticle">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="title" property="title"
+			jdbcType="VARCHAR" />
+		<result column="summary" property="summary"
+			jdbcType="VARCHAR" />
+		<result column="releaseDate" property="releaseDate" />
+		<result column="clickHit" property="clickHit"
+			jdbcType="INTEGER" />
+		<result column="replyHit" property="replyHit" jdbcType="INTEGER" />
+		<result column="content" property="content"
+			jdbcType="VARCHAR" />
+		<result column="keyWord" property="keyWord" jdbcType="VARCHAR" />
+		<result column="typeId" property="typeId"
+			jdbcType="INTEGER" />
+		<result column="articleStatus" property="articleStatus"
+			jdbcType="INTEGER" />
+	</resultMap>
+	
+	<parameterMap type="com.cn.myblog.entity.BlogArticle" id="ArticleParameterMap">
+		<parameter property="id" resultMap="ArticleresultMap" />
+		<parameter property="typeId" resultMap="ArticleresultMap" />
+	</parameterMap>
+	
+	<select id="gainOne" parameterType="java.lang.Integer" resultType="com.cn.myblog.entity.BlogArticle">
+		select * from
+		t_blog where id = #{id}
+	</select>
+
+	<select id="gainAll" resultType="com.cn.myblog.entity.BlogArticle">
+		select * from t_blog where articleStatus=0 order
+		by id
+	</select>
+
+
+	<select id="gainByType" parameterType="java.lang.Integer"
+		resultType="com.cn.myblog.entity.BlogArticle">
+		select * from t_blog where typeId =
+		#{typeId}
+	</select>
+
+	<delete id="deletebyId" parameterType="java.lang.Integer">
+		delete from t_blog
+		where id = #{id}
+	</delete>
+	
+	<update id="typeChg" parameterMap="ArticleParameterMap">
+		update t_blog set
+		typeId = #{0}
+		where id = #{1}
+	</update>
+
+	<update id="updateArticle" parameterType="com.cn.myblog.entity.BlogArticle">
+		update t_blog set
+		title = #{title},
+		summary = #{summary},
+		releaseDate = #{releaseDate},
+		clickHit = #{clickHit},
+		replyHit = #{replyHit},
+		content = #{content},
+		keyWord = #{keyWord},
+		typeId = #{typeId},
+		articleStatus = #{articleStatus}
+		where
+		id = #{id}
+	</update>
+	
+	<update id="addClickHit" parameterType="java.lang.Integer">
+		update t_blog set
+		clickHit = (clickHit+1) where
+		id = #{id}
+	</update>
+	
+
+	<insert id="addArticle" parameterType="com.cn.myblog.entity.BlogArticle"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into t_blog (title,summary,releaseDate,clickHit,replyHit,content,keyWord,typeId)
+		values (#{title},#{summary},#{releaseDate},#{clickHit},#{replyHit},#{content},#{keyWord},#{typeId})
+	</insert>
+
+	<select id="searchArts"
+		resultType="com.cn.myblog.entity.BlogArticle">
+		select * from t_blog where title like CONCAT(CONCAT('%', #{title}), '%');
+	</select>
+
+</mapper>
